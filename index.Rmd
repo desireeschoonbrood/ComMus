@@ -9,22 +9,28 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
+# plot
 ```{r pressure, echo=FALSE}
-plot(pressure)
+feat10s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DX5Ejj0EkURtP?si=1546e87d237f4331'))
+feat00s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DX4o1oenSJRJd?si=d473cc8687174041'))
+feat90s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DXbTxeAdrVG2l?si=8b8ef99d5f994ec1'))
+feat80s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DX4UtSsGT1Sbe?si=d5efcf8d8b4d4a8e'))
+
+ft <- rbind(feat80s,feat90s)
+ft2 <- rbind(ft,feat00s)
+dataframe <- rbind(ft2,feat10s)
+data_new <- dataframe                            
+
+data_new$playlist_name <- factor(data_new$playlist_name,      
+                         levels = c("All Out 80s", "All Out 90s", "All Out 2000s", "All Out 2010s"))
+
+ggplot(data_new, aes(x=loudness, y=energy, color=track.explicit)) + 
+  geom_point(alpha=0.6) + labs(
+  x = "loudness",
+  y = "energy",
+  title = "The increase in loudness of music over the years has created more energetic hits",
+  subtitle = "Loudness and energy from the biggest hits from 1980-2020",
+  caption = "Data source: Spotify") + facet_wrap(vars(playlist_name)) + 
+  theme_minimal() + scale_color_discrete(name="Explicit", labels=c("False", "True"))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
