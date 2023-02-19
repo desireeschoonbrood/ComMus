@@ -11,6 +11,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # plot
 ```{r pressure, echo=FALSE}
+library(tidyverse)
+library(usethis)
+library(spotifyr)
+library(httr)
+library(dplyr)
+library(plotly)
+library(ggplot2)
+library(httpuv)
 feat10s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DX5Ejj0EkURtP?si=1546e87d237f4331'))
 feat00s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DX4o1oenSJRJd?si=d473cc8687174041'))
 feat90s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DXbTxeAdrVG2l?si=8b8ef99d5f994ec1'))
