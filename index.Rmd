@@ -1,5 +1,5 @@
 ---
-title: "Computational Musicology 2023"
+title: "Course portfolio Computational Musicology"
 author: "Desiree Schoonbrood"
 date: "2023-02-19"
 output: html_document
@@ -7,10 +7,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
-
-# plot
-```{r pressure, echo=FALSE}
 library(tidyverse)
 library(usethis)
 library(spotifyr)
@@ -19,6 +15,17 @@ library(dplyr)
 library(plotly)
 library(ggplot2)
 library(httpuv)
+```
+## Readme
+In this portfolio the following playlists from Spotify are used: 'All Out 80s', 'All Out 90s', 'All Out 2000s' and 'All Out 2010s'. These playlists were made by Spotify and together they contain the 600 biggest songs from 1980 until 2020. Most of the older songs have been listened to until this day. It is, however, very interesting to see how taste in (and production of) music can change in these years. Therefore, the four playlists will be compared to eachother to find the differences and similarities in the biggest songs over time. I expect the genres of the songs to mostly be pop, r&b/hip-hop and rock, since these are the most popular genres. However, the popularity of each genre might change over the years. It might also be interesting to see if many artists ended up in multiple playlists.  
+The playlists were made by Spotify themselves, meaning the playlists are probably quite representative of the years that spotify was in use (since 2008). But it might not be as representative for the earlier years, since they might have just included songs that were 'timeless', meaning they were most listened to after 2008 and not in their own time. A few songs from the corpus stand out. For example, 'Beggin'' from Måneskin, since this song is actually a cover of a song from 1967 that was never popular then. Another song that stands out is 'Stan' by Eminem since it is a very long song (6.5 minutes) compared to the other songs, so it might also be interesting to look at the popularity of songs and their duration. The songs that are most typical for the time periods are probably the top 5 most played songs.
+
+
+## Data visualisation
+In the graph below, it can be seen that the loudness of hits has increased over the years. It is also obvious that there is a correlation between loudness and energy of the music. As the loudness increases, so does the energy. Lastly, there is an obvious increase in explicit songs (the blue dots) over the years.
+
+
+```{r pressure, echo=FALSE}
 feat10s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DX5Ejj0EkURtP?si=1546e87d237f4331'))
 feat00s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DX4o1oenSJRJd?si=d473cc8687174041'))
 feat90s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DXbTxeAdrVG2l?si=8b8ef99d5f994ec1'))
@@ -36,9 +43,19 @@ ggplot(data_new, aes(x=loudness, y=energy, color=track.explicit)) +
   geom_point(alpha=0.6) + labs(
   x = "loudness",
   y = "energy",
-  title = "The increase in loudness of music over the years has created more energetic hits",
+  title = "The increased loudness of music also means: more energetic hits",
   subtitle = "Loudness and energy from the biggest hits from 1980-2020",
   caption = "Data source: Spotify") + facet_wrap(vars(playlist_name)) + 
   theme_minimal() + scale_color_discrete(name="Explicit", labels=c("False", "True"))
+```
+
+In the following graph, we can see that the tracks from the 2010 playlist are the most popular. The playlist with 2000s songs includes on average less popular tracks than the 2010 playlist and the 90s and 80s playlists contain even less popular songs. It is very interesting to see that the 'All Out 2000s' playlist contains the most popular songs, since Spotify existed during the release of these tracks and not during the release of the tracks from 1980-2008. 
+
+
+```{r, echo=FALSE}
+ggplot(data_new, aes(x=track.popularity, fill=playlist_name, text = paste(playlist_name)))+
+  geom_density(alpha=0.5, color=NA)+ scale_fill_manual(values=c('yellow', 'blue', 'red', 'orange'))+
+  labs(x="Popularity", y="Density") + guides(fill=guide_legend(title="Playlist"))+
+  ggtitle("Distribution of Popularity Data") + theme_minimal()
 ```
 
