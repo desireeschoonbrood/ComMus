@@ -24,7 +24,7 @@ library(compmus)
 ```
 
 ### Introduction
-In this portfolio the following playlists from Spotify are used: *'All Out 80s'*, *'All Out 90s'*, *'All Out 2000s'* and *'All Out 2010s'*. These playlists were made by Spotify and together they contain the 600 biggest songs from 1980 until 2020. It is very interesting to see how taste in (and production of) music can change in these years. Therefore, the four playlists will be compared to each other to find the differences and similarities in the biggest songs over time. I expect the genres of the songs to mostly be pop, r&b/hip-hop and rock, since these are on average the most popular genres. However, the popularity of each genre might change over the years. It might also be interesting to see if many artists ended up in multiple playlists and how several track-level features of hit songs have changed over the years, such as loudness, popularity, danceability or energy.
+In this portfolio the following playlists from Spotify are used: [*'All Out 80s'*](https://open.spotify.com/playlist/37i9dQZF1DX4UtSsGT1Sbe?si=7134e1d7e6a44db1), [*'All Out 90s'*](https://open.spotify.com/playlist/37i9dQZF1DXbTxeAdrVG2l?si=2fe9f5ed620f480a), [*'All Out 2000s'*](https://open.spotify.com/playlist/37i9dQZF1DX4o1oenSJRJd?si=a26f344053244edf) and [*'All Out 2010s'*](https://open.spotify.com/playlist/37i9dQZF1DX5Ejj0EkURtP?si=109cbfd19dd94fb5). These playlists were made by Spotify and together they contain the 600 biggest songs from 1980 until 2020. It is very interesting to see how taste in (and production of) music can change in these years. Therefore, the four playlists will be compared to each other to find the differences and similarities in the biggest songs over time. I expect the genres of the songs to mostly be pop, r&b/hip-hop and rock, since these are on average the most popular genres. However, the popularity of each genre might change over the years. It might also be interesting to see if many artists ended up in multiple playlists and how several track-level features of hit songs have changed over the years, such as loudness, popularity, danceability or energy.
 
 
 The playlists were made by Spotify themselves, meaning the playlists are probably quite representative of the years that Spotify was in use (since 2008). But it might not be as representative for the earlier years, since they might have just included songs that were 'timeless', meaning they were most listened to after 2008 and not in their own time. A few songs from the corpus stand out. For example, *'Beggin''* from Måneskin, since this song is actually a cover of a song from 1967 that was never popular then. Another song that stands out is *'Stan'* by Eminem since it is a very long song (6.5 minutes) compared to the other songs, so it might also be interesting to look at the popularity of songs and their duration. The songs that are most typical for the time periods are probably the top 5 most played songs.
@@ -32,20 +32,18 @@ The playlists were made by Spotify themselves, meaning the playlists are probabl
 ### Increase of loudness, energy and explicit language use in hit songs over the years [track-level features]
 
 ```{r, echo=FALSE}
-feat10s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DX5Ejj0EkURtP?si=1546e87d237f4331'))
-feat00s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DX4o1oenSJRJd?si=d473cc8687174041'))
-feat90s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DXbTxeAdrVG2l?si=8b8ef99d5f994ec1'))
-feat80s <- get_playlist_audio_features('spotify',playlist_uris=c('37i9dQZF1DX4UtSsGT1Sbe?si=d5efcf8d8b4d4a8e'))
-
-ft <- rbind(feat80s,feat90s)
-ft2 <- rbind(ft,feat00s)
-dataframe <- rbind(ft2,feat10s)
-data_new <- dataframe                            
-
-data_new$playlist_name <- factor(data_new$playlist_name,      
+eighties <- get_playlist_audio_features("", "37i9dQZF1DX4UtSsGT1Sbe")
+nineties <- get_playlist_audio_features("", "37i9dQZF1DXbTxeAdrVG2l")
+zeros <- get_playlist_audio_features("", "37i9dQZF1DX4o1oenSJRJd")
+tens <- get_playlist_audio_features("", "37i9dQZF1DX5Ejj0EkURtP")
+one<- rbind(eighties,nineties)
+two <- rbind(zeros,tens)
+years_data <- rbind(one,two)
+years_data$playlist_name <- factor(years_data$playlist_name,      
                          levels = c("All Out 80s", "All Out 90s", "All Out 2000s", "All Out 2010s"))
 
-plot1<-ggplot(data_new, aes(x=loudness, y=energy, color=track.explicit)) + 
+
+plot1<-ggplot(years_data, aes(x=loudness, y=energy, color=track.explicit, label = track.name)) + 
   geom_point(alpha=0.6) + labs(
   x = "loudness (db)",
   y = "energy",
@@ -64,7 +62,7 @@ In this graph, it can be seen that the loudness of hits has significantly increa
 ### 'All Out 2010s' contains the most popular tracks compared to the other playlists [track-level features]
 
 ```{r, echo=FALSE}
-plot2<- ggplot(data_new, aes(x=track.popularity, fill=playlist_name, text = paste(playlist_name)))+
+plot2<- ggplot(years_data, aes(x=track.popularity, fill=playlist_name, text = paste(playlist_name)))+
   geom_density(alpha=0.5, color=NA)+ scale_fill_manual(values=c('yellow', 'blue', 'red', 'orange'))+
   labs(x="Popularity", y="Density") + guides(fill=guide_legend(title="Playlist"))+
   ggtitle("Distribution of popularity of playlists' tracks") + theme_minimal()
@@ -102,9 +100,54 @@ cr |>
   scale_fill_viridis_c()
 ```
  
-***
+---
  
 This chromagram shows the chroma features of Wicked Game by Chris Isaak. Wicked Game is known as a soft rock song and is performed in a sorrowfully conflicted, brooding tone. This song is the least loud song in the corpus (-18.090) and also has low energy (0.296).
 
 As can be seen in the chromagram, the song is mostly in B key and E key. It does not change pitch a lot, except for a few moments when it changes to A, C#|Db or F#|Ab. The fact that the pitch is mostly E and B might attribute to the low energy in the song. 
+
+<iframe src="https://open.spotify.com/embed/track/2S6XOQqWqUBIySUU00vMru?utm_source=generator" width="100%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+
+### Cepstrogram
+
+```{r, echo=FALSE}
+bzt <-
+  get_tidy_audio_analysis("7w5AOd6HrDIHewHfpABEss") |> # Change URI.
+  compmus_align(bars, segments) |>                     # Change `bars`
+  select(bars) |>                                      #   in all three
+  unnest(bars) |>                                      #   of these lines.
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  )
+
+bzt |>
+  compmus_gather_timbre() |>
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = basis,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  scale_fill_viridis_c() +                              
+  theme_classic()
+```
+ 
+***
+ 
+This cepstrogram shows...
 
