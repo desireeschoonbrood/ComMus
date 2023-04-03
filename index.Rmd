@@ -1,7 +1,7 @@
 ---
 title: "Course portfolio Computational Musicology"
 author: "Desiree Schoonbrood"
-date: "2023-02-26"
+date: "2023-04-02"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
@@ -252,7 +252,7 @@ This graph shows the tempogram of the most popular song in the corpus (91 popula
 
 ### Conclusion
 
-What can be concluded from this portfolio is that the loudness of the biggest hits have increased over the years, and with it the energy in the songs has also increased. There are some outliers such as 'Wicked Game' that were popular but had less energy and loudness compared to more average songs such as 'Genie In a Bottle'. Most songs that were typical for the playlists were in C, C# or F. A popular song might have a BPM of around 240, like the song 'Another Love' by Tom Odell.
+In this portfolio, I looked at how popular music changes trough the years and at what makes a song popular, which is something all artists are interested in. What can be concluded from this portfolio is that the loudness of the biggest hits have increased over the years, and with it the energy in the songs has also increased. There are some outliers such as 'Wicked Game' that were popular but had less energy and loudness compared to more average songs such as 'Genie In a Bottle'. Most songs that were typical for the playlists were in C, C# or F. A popular song might have a BPM of around 240, like the song 'Another Love' by Tom Odell.
 
 
 
