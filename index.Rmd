@@ -6,30 +6,52 @@ output:
   flexdashboard::flex_dashboard:
     orientation: columns
     storyboard: true
+    vertical_layout: fill
     theme: cerulean
     highlight: tango
-    vertical_layout: fill
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(remotes)
+library(usethis)
 library(flexdashboard)
 library(tidyverse)
 library(spotifyr)
 library(dplyr)
 library(plotly)
+library(ranger)
 library(ggplot2)
 library(lubridate)
 library(compmus)
+library(ggdendro)
+library(tidymodels)
+library(heatmaply)
+library(protoclust)
+library(cowplot)
+library(kknn)
 ```
 
 ### Introduction
-In this portfolio the following playlists from Spotify are used: [*'All Out 80s'*](https://open.spotify.com/playlist/37i9dQZF1DX4UtSsGT1Sbe?si=7134e1d7e6a44db1), [*'All Out 90s'*](https://open.spotify.com/playlist/37i9dQZF1DXbTxeAdrVG2l?si=2fe9f5ed620f480a), [*'All Out 2000s'*](https://open.spotify.com/playlist/37i9dQZF1DX4o1oenSJRJd?si=a26f344053244edf) and [*'All Out 2010s'*](https://open.spotify.com/playlist/37i9dQZF1DX5Ejj0EkURtP?si=109cbfd19dd94fb5). These playlists were made by Spotify and together they contain the 600 biggest songs from 1980 until 2020. It is very interesting to see how taste in (and production of) music can change in these years. Therefore, the four playlists will be compared to each other to find the differences and similarities in the biggest songs over time. I expect the genres of the songs to mostly be pop, r&b/hip-hop and rock, since these are on average the most popular genres. However, the popularity of each genre might change over the years. It might also be interesting to see if many artists ended up in multiple playlists and how several track-level features of hit songs have changed over the years, such as loudness, popularity, danceability or energy.
+In this portfolio the following playlists from Spotify are used: [*'All Out 80s'*](https://open.spotify.com/playlist/37i9dQZF1DX4UtSsGT1Sbe?si=7134e1d7e6a44db1), [*'All Out 90s'*](https://open.spotify.com/playlist/37i9dQZF1DXbTxeAdrVG2l?si=2fe9f5ed620f480a), [*'All Out 2000s'*](https://open.spotify.com/playlist/37i9dQZF1DX4o1oenSJRJd?si=a26f344053244edf) and [*'All Out 2010s'*](https://open.spotify.com/playlist/37i9dQZF1DX5Ejj0EkURtP?si=109cbfd19dd94fb5). These playlists were made by Spotify and together they contain the 600 biggest songs from 1980 until 2020. It is very interesting to see how taste in (and production of) music can change in these years. Therefore, the four playlists will be compared to each other to find the differences and similarities in the biggest songs over time. I expect the genres of the songs to mostly be pop, r&b/hip-hop and rock, since these are on average the most popular genres. However, the popularity of each genre might change over the years. It will interesting to see how several track-level features of hit songs have changed over the years, such as loudness, popularity or energy.
 
+The playlists were made by Spotify themselves, meaning the playlists are probably quite representative of the years that Spotify was in use (since 2008). But it might not be as representative for the earlier years, since they might have just included songs that were 'timeless', meaning they were most listened to after 2008 and not in their own time. A few songs from the corpus stand out. For example, *'Wicked Game''* from Chris Isaak, since this song is quite a lot slower than the other songs. The songs that are most typical for the time periods (playlists) are their most popular songs.
 
-The playlists were made by Spotify themselves, meaning the playlists are probably quite representative of the years that Spotify was in use (since 2008). But it might not be as representative for the earlier years, since they might have just included songs that were 'timeless', meaning they were most listened to after 2008 and not in their own time. A few songs from the corpus stand out. For example, *'Beggin''* from Måneskin, since this song is actually a cover of a song from 1967 that was never popular then. Another song that stands out is *'Stan'* by Eminem since it is a very long song (6.5 minutes) compared to the other songs, so it might also be interesting to look at the popularity of songs and their duration. The songs that are most typical for the time periods are probably the top 5 most played songs.
+***
+<!--html_preserve-->
+<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX4UtSsGT1Sbe?utm_source=generator" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+<!--/html_preserve-->
+<!--html_preserve-->
+<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DXbTxeAdrVG2l?utm_source=generator" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+<!--/html_preserve-->
+<!--html_preserve-->
+<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX4o1oenSJRJd?utm_source=generator" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+<!--/html_preserve-->
+<!--html_preserve-->
+<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX5Ejj0EkURtP?utm_source=generator" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+<!--/html_preserve-->
 
-### Increase of loudness, energy and explicit language use in hit songs over the years [track-level features]
+### Increase of loudness, energy and explicit language use in hit songs over the years
 
 ```{r, echo=FALSE}
 eighties <- get_playlist_audio_features("", "37i9dQZF1DX4UtSsGT1Sbe")
@@ -44,7 +66,7 @@ years_data$playlist_name <- factor(years_data$playlist_name,
 
 
 plot1<-ggplot(years_data, aes(x=loudness, y=energy, color=track.explicit, label = track.name)) + 
-  geom_point(alpha=0.6) + labs(
+  geom_point(alpha=0.65) + labs(
   x = "loudness (db)",
   y = "energy",
   title = "The loudness race's effect on music's energy",
@@ -57,9 +79,11 @@ ggplotly(plot1)
 
 ***
 
-In this graph, it can be seen that the loudness of hits has significantly increased since 1980. This phenomenon is also called the *'loudness race'*. Since loudness can range between -60 and 0 db, it is very interesting to see that none of the hit songs have a loudness below -20. It is also obvious that there is a correlation between loudness and energy of the music. Here, energy ranges from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. This graph shows that, as the loudness increases, so does the energy. Lastly, there is an obvious increase in the use of explicit language (the blue dots) in songs over the years. The increased loudness, energy and use of explicit language might have had an effect on the popularity the tracks in these playlistst. 
+In this graph, it can be seen that the loudness of hits has significantly increased since 1980. This phenomenon is also called the *'loudness race'*. Since loudness can range between -60 and 0 db, it is very interesting to see that none of the hit songs have a loudness below -20. 
 
-### 'All Out 2010s' contains the most popular tracks compared to the other playlists [track-level features]
+It is also obvious that there is a correlation between loudness and energy of the music. Here, energy ranges from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. This graph shows that, as the loudness increases, so does the energy. Lastly, there is an obvious increase in the use of explicit language (the blue dots) in songs over the years. The increased loudness, energy and use of explicit language might have an effect on the popularity of the tracks in these playlists. 
+
+### 'All Out 2010s' contains the most popular tracks compared to the other playlists
 
 ```{r, echo=FALSE}
 plot2<- ggplot(years_data, aes(x=track.popularity, fill=playlist_name, text = paste(playlist_name)))+
@@ -72,9 +96,25 @@ ggplotly(plot2)
 
 ***
 
-In this graph, we can see the distribution of the popularity of tracks in the four playlists. We can see that the tracks from the 2010 playlist are the most popular. The playlist with 2000s songs includes on average less popular tracks than the 2010 playlist and the 90s and 80s playlists contain even less popular songs. It is very interesting to see that there is an increase in popularity of the playlists over the years and that the 'All Out 2010s' playlist contains the most popular songs. This might be an effect of the increased loudness, energy, use of explicit language or other changes that happened in music over the years. However, this might also (partially) be caused by the fact that Spotify already existed during the release of these tracks and not during the release of the tracks from 1980-2008.
+In this graph, we can see the distribution of the popularity of tracks in the four playlists. We can see that the tracks from the 2010 playlist are the most popular. The playlist with 2000s songs includes on average less popular tracks than the 2010 playlist and the 90s and 80s playlists contain even less popular songs. 
 
-### Chromagram of the least loud song: Wicked Game [chroma features]
+It is very interesting to see that there is an increase in popularity of the playlists over the years and that the 'All Out 2010s' playlist contains the most popular songs. This might be an effect of the increased loudness, energy, use of explicit language or other changes that happened in music over the years. However, this might also (partially) be caused by the fact that Spotify already existed during the release of these tracks and not during the release of the tracks from 1980-2008.
+
+### Use of key in the playlists
+
+```{r, echo=FALSE}
+plott<-ggplot(years_data,aes(key)) + geom_histogram(stat='count') + facet_wrap(vars(playlist_name)) + scale_x_discrete(limits=c(0:12),labels = c('C', 'C#','D','D#','E','F','F#','G','G#','A','A#','B')) +
+  ggtitle("Musical key by playlist")
+
+ggplotly(plott)
+```
+ 
+***
+
+In this graph, the use of keys over the playlists can be seen. In the 80's C was the most used and D# the least. In the 90's B was the most used and again D# the least. In 2000's the F is most used and G# the least. IN 2010's, C# was most used and D# the least. Over all, the use of D# is the lowest with only 12 songs. So this key is not used a lot in the biggest hits. The use of C# is the highest with 70 songs, which means that it is a very popular key for the creation of hitsongs.
+
+
+### Chromagram of the least loud song: Wicked Game
 
 ```{r, echo=FALSE}
 cr <- get_tidy_audio_analysis("7w5AOd6HrDIHewHfpABEss") |>
@@ -83,7 +123,7 @@ cr <- get_tidy_audio_analysis("7w5AOd6HrDIHewHfpABEss") |>
   select(start, duration, pitches)
 
 cr |>
-  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
+  mutate(pitches = map(pitches, compmus_normalise, "chebyshev")) |>
   compmus_gather_chroma() |> 
   ggplot(
     aes(
@@ -102,16 +142,55 @@ cr |>
  
 ---
  
-This chromagram shows the chroma features of Wicked Game by Chris Isaak. Wicked Game is known as a soft rock song and is performed in a sorrowfully conflicted, brooding tone. This song is the least loud song in the corpus (-18.090) and also has low energy (0.296).
+Since hits have gotten louder during the years and also more popular. Then it is interesting to look at why less loud songs end up to be a hitsong. This chromagram shows the chroma features of Wicked Game by Chris Isaak. Wicked Game is known as a soft rock song from the 90's and is performed in a sorrowfully conflicted, brooding tone. This song is the least loud song in the corpus (-18.090) and also has low energy (0.296).
 
-As can be seen in the chromagram, the song is mostly in B key and E key. It does not change pitch a lot, except for a few moments when it changes to A, C#|Db or F#|Ab. The fact that the pitch is mostly E and B might attribute to the low energy in the song. 
+As can be seen in the chromagram, the song is mostly in B and E key, expect for the parts when it changes to F# (230s - 270s) and C# (190s - 220s). It does not change pitch very quickly, since the song is quite slow. The fact that the pitch is mostly E and B and does not change quickly attributes to the low energy in the song. 
 
-<iframe src="https://open.spotify.com/embed/track/2S6XOQqWqUBIySUU00vMru?utm_source=generator" width="100%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+<!--html_preserve-->
+<iframe src="https://open.spotify.com/embed/track/7w5AOd6HrDIHewHfpABEss?utm_source=generator" width="100%" height="200" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+<!--/html_preserve-->
 
-### Cepstrogram
+### Chromagram of an average song (loudness): Genie In a Bottle
 
 ```{r, echo=FALSE}
-bzt <-
+cr2 <- get_tidy_audio_analysis("11mwFrKvLXCbcVGNxffGyP") |>
+  select(segments) |>
+  unnest(segments) |>
+  select(start, duration, pitches)
+
+cr2 |>
+  mutate(pitches = map(pitches, compmus_normalise, "chebyshev")) |>
+  compmus_gather_chroma() |> 
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = pitch_class,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  ggtitle("Chromagram of Genie In a Bottle by Cristina Aguilera")+
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  theme_minimal() +
+  scale_fill_viridis_c()
+```
+ 
+***
+ 
+This chromagram shows the chroma features of Genie In a Bottle by Christina Aguilera. This song is a teen pop and dance-pop song from the 90's, which incorporates elements from R&B. This song is for loudness very average in the 90's playlist (-6.945) and has much higher energy than Wicked Game (0.800).
+
+As can be seen in the chromagram, the song is mostly in C#|Db and C key and a litte F (40s - 70s and 100s - 220s). These keys are popular in the corpus, as showed earlier, which makes the song a typical hit for this corpus. It changes pitch quite quickly, which attributes to higher energy than Wicked Game.
+
+<!--html_preserve-->
+<iframe src="https://open.spotify.com/embed/track/11mwFrKvLXCbcVGNxffGyP?utm_source=generator" width="100%" height="200" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+<!--/html_preserve-->
+
+
+### Cepstrogram of outlier Wicked Game
+
+```{r, echo=FALSE}
+cep <-
   get_tidy_audio_analysis("7w5AOd6HrDIHewHfpABEss") |> # Change URI.
   compmus_align(bars, segments) |>                     # Change `bars`
   select(bars) |>                                      #   in all three
@@ -131,7 +210,7 @@ bzt <-
       )
   )
 
-bzt |>
+cep |>
   compmus_gather_timbre() |>
   ggplot(
     aes(
@@ -143,11 +222,37 @@ bzt |>
   ) +
   geom_tile() +
   labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  ggtitle("Cepstrogram of Wicked Game by Chris Isaak")+
   scale_fill_viridis_c() +                              
   theme_classic()
 ```
  
 ***
  
-This cepstrogram shows...
+Some songs do not use a consistent melody or beat. They often change in the outro or intro, but some songs suddenly contain different parts in the middle. Wicked Game is one of those songs. In this song there is a big beat switch in the sections 20s - 50s, 100s - 110s and 190s - 210s in the c03 component. The rest seems quite consistent.
+
+
+### Tempogram of the number 1 most popular songs per decade
+
+```{r, echo=FALSE}
+graveola3 <- get_tidy_audio_analysis("3JvKfv6T31zO0ini8iNItO")
+graveola3 |>
+  tempogram(window_size = 8, hop_size = 1, cyclic = FALSE) |>
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  labs(x = "Time (s)", y = "Tempo (BPM)") +
+  theme_classic()
+```
+ 
+***
+ 
+This graph shows the tempogram of the most popular song in the corpus (91 popularity). It is a song from 2010 called 'Another Love' by Tom Odell. It's tempo lies around 240 BPM and gets a little higher (250 BPM) after 100 seconds. So this might be the ideal tempo for a popular song.
+
+
+### Conclusion
+
+What can be concluded from this portfolio is that the loudness of the biggest hits have increased over the years, and with it the energy in the songs has also increased. There are some outliers such as 'Wicked Game' that were popular but had less energy and loudness compared to more average songs such as 'Genie In a Bottle'. Most songs that were typical for the playlists were in C, C# or F. A popular song might have a BPM of around 240, like the song 'Another Love' by Tom Odell.
+
+
 
